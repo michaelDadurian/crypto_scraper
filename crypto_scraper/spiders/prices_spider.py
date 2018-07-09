@@ -42,9 +42,7 @@ class PricesSpider(scrapy.Spider):
 		
 		
 		urls = [
-			
 			'https://prices.org/'
-			
 			
 		]
 
@@ -71,6 +69,7 @@ class PricesSpider(scrapy.Spider):
 		most_recent_price = 0
 		data_file = coin + ".txt"
 		
+		"""
 		try:
 			fr = open(data_file, 'r')
 			lines = fr.readlines()
@@ -81,7 +80,7 @@ class PricesSpider(scrapy.Spider):
 			fr = open(data_file, 'w')
 		
 		fr.close()
-		
+		"""
 		curr_usd = re.findall('"([^"]*)"', response.xpath(xpath_usd_str).re(r'data-usd.*')[0])[0]
 		curr_vol = re.findall('"([^"]*)"', response.xpath(xpath_vol_str).re(r'data-usd.*')[0])[0]
 		#print (int(float(curr_vol)))
@@ -93,14 +92,16 @@ class PricesSpider(scrapy.Spider):
 		
 		line = curr_usd + ' ' + curr_vol + ' ' + curr_time + ' ' + site + '\n'
 		
+		print(line)
 		
-			
+		"""
 		with open (data_file, 'a') as fw:
 			if (float(most_recent_price) != float(curr_usd)): 
 				fw.write(line)
 					
 					
 		fw.close()
+		"""
 		#time.sleep(1)
 		yield scrapy.Request(response.url, callback=self.parse, dont_filter=True)
 		"""

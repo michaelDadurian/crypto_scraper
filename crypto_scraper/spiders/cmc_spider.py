@@ -42,7 +42,7 @@ except Error as e:
 	print(e)
 
 cursor = connection.cursor()
-sql = """CREATE TABLE IF NOT EXISTS Coin (NAME CHAR(5) NOT NULL, USD FLOAT, VOLUME LONG, DATE DATETIME())"""
+sql = ""CREATE TABLE IF NOT EXISTS Coin (NAME CHAR(5) NOT NULL, USD FLOAT, VOLUME LONG, DATE DATETIME())""
 cursor.execute(sql)
 connection.close()
 """
@@ -56,7 +56,8 @@ class CMCSpider(scrapy.Spider):
 		
 		urls = [
 			
-			'https://coinmarketcap.com/'
+			'https://coinmarketcap.com/',
+			'https://prices.org/'
 			
 			
 		]
@@ -74,13 +75,21 @@ class CMCSpider(scrapy.Spider):
 		self.logger.info('Got successful response from %s' % response.url)
 		self.logger.info('STATUS: %d' % response.status)
 		
-		xpath_usd_str = '//*[@id="id-' + coin + '"]/td[4]/a'
-		xpath_vol_str = '//*[@id="id-' + coin + '"]/td[5]/a'
-		site = "coinmarketcap.com"
+		if 'prices' in response.url:
+			code = coin_lookup[coin]
+			print(code)
+			xpath_usd_str = '//*[@id="' + code + '"]/td[3]' 
+			xpath_vol_str = '//*[@id="' + code + '"]/td[8]'
+			site = "prices.org"
+		else:
+			xpath_usd_str = '//*[@id="id-' + coin + '"]/td[4]/a'
+			xpath_vol_str = '//*[@id="id-' + coin + '"]/td[5]/a'
+			site = "coinmarketcap.com"
 
 		"""Begin parsing"""
 		most_recent_price = 0
 		data_file = coin + ".txt"
+		
 		
 		try:
 			fr = open(data_file, 'r')
@@ -103,15 +112,15 @@ class CMCSpider(scrapy.Spider):
 		"""Write data to file"""
 		
 		line = curr_usd + ' ' + curr_vol + ' ' + curr_time + ' ' + site + '\n'
+		print(line)
 		
-		
-			
 		with open (data_file, 'a') as fw:
 			if (float(most_recent_price) != float(curr_usd)): 
 				fw.write(line)
 					
 					
 		fw.close()
+		
 		#time.sleep(1)
 		yield scrapy.Request(response.url, callback=self.parse, dont_filter=True)
 		"""

@@ -21,8 +21,8 @@ coin_lookup = {
 """
 try:
 	connection = mysql.connector.connect(
-						user='mdadurian',
-						password='Wafflefries12@', 
+						user='*******',
+						password='**********', 
 						host='127.0.0.1', 
 						database='crypto_scraper')
 						
